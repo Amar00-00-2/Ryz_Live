@@ -1,0 +1,44 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Gill Api Doc",
+      "description": "",
+      "version": "1.0"
+    },
+    "host": "gogdev.treeone.one",
+    "basePath": "/v1",
+    "produces": ["application/json"],
+    "schemas": ["http", "https"],
+    "paths": {
+      "/alert/set_alert": {
+        "post": {
+          "x-swagger-router-controller": "home",
+          "operationId": "index",
+          "tags": ["/alert"],
+          "description": "[Login 123](https://www.google.com)",
+          "parameters": [{
+            "name": "test",
+            "in": "formData",
+            "type": "array",
+            "collectionFormat": "multi",
+            "items": {
+              "type": "integer"
+             }
+          },
+        { "name": "profileId", "in": "formData", "required": true, "type": "string" },
+        { "name": "file", "in": "formData", "type": "file", "required": "true" }],
+          "responses": {}
+        }
+      },
+      "/alert/get_alert_list": {
+         "get": {
+           "x-swagger-router-controller": "bar",
+           "operationId": "impossible",
+           "tags": ["/alert"],
+           "description": "",
+           "parameters": [],
+           "responses": {}
+         }
+       }
+    }
+ }

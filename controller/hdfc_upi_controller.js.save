@@ -1,0 +1,183 @@
+const { hdfcUPIModel } = require("../model")
+const axios = require('axios')
+const encrypt_decrypt = require("../hdfc_upi")
+const {PayinModel} = require('../model')
+
+module.exports = {
+    verify_UPI_fn: async (req, res) => {
+        try {
+            const payerAddress = req.body.payerAddress
+            // const payerAddress = "sumit039@hdfcbank"
+            const referenceNo = Date.now()
+            const inputValue = `${process.env.MERCHANTID}|${referenceNo}|${payerAddress}|T|||||||||NA|NA`
+            const encryptedValue = await encrypt_decrypt.encryption(inputValue, process.env.SECUREKEY)
+            console.log('encryptedValue', encryptedValue)
+            const hdfcAPIResponse = await axios.post(process.env.APIHdfcURL + '/checkMeVirtualAddress', {
+                requestMsg: encryptedValue,
+                pgMerchantId: process.env.MERCHANTID
+            })
+            const responseValue = hdfcAPIResponse.data
+            console.log('responseValue', responseValue)
+            const responseDecryption = await encrypt_decrypt.decryption(responseValue, process.env.SECUREKEY)
+            console.log('responseDecryption', responseDecryption)
+            const splitResponse = responseDecryption.split('|')
+            if(splitResponse[3] === 'VE') {
+                return res.json ({ status: "success", result: "Verified" })
+            } else if (splitResponse[3] === 'VN') {
+                return res.json ({ status: "success", result: "NotVerified" })
+            } else {
+                return res.json ({ status: "failed", result: "Failed" })
+            }
+        } catch (error) {
+            return res.json({status: 'failed', message: error })
+        }
+    },
+    transaction_request_fn: async (req, res) => {
+        try {
+            const amount = req.body.amount
+            const userId = req.body.userId
+            const accountNumber = req.body.accountNumber
+            // const userId = "TABTREE09"
+            // const amount = 1
+            const payerAddress = req.body.payerAddress
+            // const payerAddress = "sumit039@hdfcbank"
+            const referenceNo = Date.now()
+            // const inputValue = 'HDFC000000000214|13579111315134|sumit039@hdfcbank|21|TEST|10|1245|||||||||NA|NA'
+            const inputValue = `${process.env.MERCHANTID}|${referenceNo}|${payerAddress}|${amount}|Transaction Request|10|||||||MEBR|${accountNumber}||NA|NA`
+            const encryptedValue = await encrypt_decrypt.encryption(inputValue, process.env.SECUREKEY)
+            console.log('encryptedValue', encryptedValue)
+            const hdfcAPIResponse = await axios.post(process.env.APIHdfcURL + '/meTransCollectSvc', {
+                requestMsg: encryptedValue,
+                pgMerchantId: process.env.MERCHANTID
+            })
+            const responseValue = hdfcAPIResponse.data
+            console.log('responseValue', responseValue)
+            const responseDecryption = await encrypt_decrypt.decryption(responseValue, process.env.SECUREKEY)
+            console.log('responseDecryption', responseDecryption)
+            const splitResponse = responseDecryption.split('|')
+            console.log('splitResponse', splitResponse[3])
+            if(splitResponse[3] === 'SUCCESS') {
+                const insertData = await hdfcUPIModel.create({
+                    user_id: userId,
+                    ref_number: splitResponse[0],
+                    transaction_id: splitResponse[1],
+                    api_request: inputValue,
+                    api_response: responseDecryption
+                })
+                console.log('insertData', insertData)
+                return res.json({ status: 'success', result: responseDecryption, message: "Transaction Request Success" })
+            } else {
+                return res.json({ status: 'failed', result: responseDecryption, message: "Transaction Request Failed" })
+            }
+        } catch (error) {
+            res.json({ status: 'failed', message: error })
+        }
+    },
+//    fetchBankResponse: async (req, res) => {
+//        console.log('saroreq', req.body)
+//        try {
+//            const callBackResponse  = req.body.meRes
+//            const decryptCallBack = encrypt_decrypt.decryption(callBackResponse, process.env.SECUREKEY)
+//            const splitResponse = decryptCallBack.split('|')
+//            const updateData = await hdfcUPIModel.update({
+//                callback_response: decryptCallBack,
+//                updated_at: Date.now()
+//            }, {
+//                where: [{ref_number: splitResponse[1]}, {transaction_id: splitResponse[0]}]
+//            })
+//            console.log('decryptCallBack', decryptCallBack)
+//            return res.json({status: "success", result: updateData })
+//        } catch (error) {
+//            res.json({status: "failed", message: error.message })
+//        }
+//    },
+    fetchBankResponse: async (req, res) => {
+        console.log('saroreq', req.body)
+        try {
+            const callBackResponse  = req.body.meRes
+            const decryptCallBack = encrypt_decrypt.decryption(callBackResponse, process.env.SECUREKEY)
+            const splitResponse = decryptCallBack.split('|')
+            if(splitResponse[4]=='SUCCESS'){
+		console.log("Suucessss")
+                const getCallBackResponse = await hdfcUPIModel.findOne({
+                    where: [{ref_number: splitResponse[1]}],
+                    attributes: ['user_id']
+                })
+                 // get admin token to do payin api
+                //const getAdmin = await axios.post(`${process.env.MainUrl}/backofficeapi/login`, {
+                //    "userID": process.env.BOUSERID,
+                //    "password": process.env.BOPASSWORD
+                //})
+                //const adminToken =  getAdmin.data.result.Token
+		//console.log("adminToken",adminToken)
+                // call payin api using admin token 
+                //try {
+                //const payin = await axios.post(`${process.env.MainUrl}/backofficeapi/updatermslimit/rmsfields`, {
+                //    "LoginId":"ADMIN",
+                //    "ClientId":getCallBackResponse.dataValues.user_id,
+                //    "NotionalCash":0,
+                //   "PayInAmout": Number(splitResponse[2]),
+                //    "PayOutAmout":0,
+                //   "DirectCollatral":0,
+                //    "AdhocAll":0,
+                //    "AdhocCashNRML":0,
+                //    "AdhocCashMIS":0,
+                //    "AdhocFONRML":0,
+                //    "AdhocFOMIS":0,
+                //    "AdhocCURNRML":0,
+                //    "AdhocCURMIS":0,
+                //    "AdhocCOMNRML":0,
+                //    "AdhocCOMMIS":0,
+                //    "AdhocCashCNC":0,
+                //    "IsIncrementValue":true,
+                //    "RMSSegment":31,
+                //    "RMSExchange":31,
+                //    "RMSProduct":63
+                //}, {
+                //    headers: {
+                //        Authorization: adminToken
+                //    }
+                //})
+		//console.log("payin",payin.data)
+		//res.json({status:"success",msg: "success"})
+                // after api made a success response then run this script to track payment with userid
+                //await PayinModel.create({userId: req.headers.userid, amount: req.body.amount, paymentId: success.razorpay_payment_id,apiResponse: JSON.stringify(payin.data) })
+            //}catch(error) {
+                //console.log("error1",error)
+                //res.send({ 'status': 'failed', 'msg': error.response.data.description })
+            }}else{
+		console.log("error2")
+               // res.send({'status':'failed','msg':"transaction failed"})
+		const updateData = await hdfcModel.update({
+		
+ca})
+            }
+
+            const updateData = await hdfcUPIModel.update({
+                callback_response: decryptCallBack,
+                updated_at: Date.now()
+            },{
+                where: [{ref_number: splitResponse[1]}, {transaction_id: splitResponse[0]}]
+            })
+            console.log('updateData', updateData)
+	    return res.json({status: "success", result: updateData })
+        } catch (error) {
+	    console.log("Error:",error.message)
+            res.json({status: "failed", message: error.message })
+        }
+    },
+    testCallBack_fn: async (req, res) => {
+        try {
+            const transactionId = "5841131"
+            const getCallBackResponse = await hdfcUPIModel.findOne({
+                where: [{transaction_id: transactionId}],
+                attributes: ['callback_response']
+            })
+            const callBackResponse = getCallBackResponse.dataValues.callback_response
+            console.log('getCallBackResponse', callBackResponse)
+            return res.json(callBackResponse)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}

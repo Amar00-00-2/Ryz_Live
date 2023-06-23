@@ -1,0 +1,34 @@
+MODE = DEV
+
+PORT = 4440
+
+
+
+MainUrl=http://trd.gillbroking.com:3000
+
+
+APIMarketDataURL = http://trd.gillbroking.com:3000/marketdata
+
+
+# Developement URL
+# APIInteractiveURL = https://developers.symphonyfintech.in/interactive
+APIInteractiveURL = http://trd.gillbroking.com:3000
+
+# Enterprise URL
+# APIInteractiveURL = http://trd.gillbroking.com:3000/enterprise
+
+SocketMarketDataURL = https://developers.symphonyfintech.in/marketdata
+
+
+
+# MYSQL CONFIG
+DATABASE=gill_stock_api
+USERNAME=munish
+PASSWORD=Munish@123
+HOST=localhost
+
+
+
+# RAZORPAY CREDENTIALS
+RZPKEY=rzp_test_Mkxc5agdviILGW
+RZPSECRETKEY=ts933M8WffW7Bw3k2DpkoDfg

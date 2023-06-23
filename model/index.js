@@ -1,0 +1,22 @@
+module.exports = {
+    userModel: require('./user.model'),
+    subscriptionTrackingModel: require('./subscription_tracking'),
+    subscriptionTrackingModel1510: require('./subscription_tracking_1510'),
+    watchlistModel: require('./watchlist.model'),
+    recentsearchModel: require('./recent_search.model'),
+    PayinModel: require('./payin.model'),
+    PayoutModel: require('./payout.model'),
+    BasketModel: require('./basket.model'),
+    AppConfigModel: require('./appConfig.model'),
+    KycFlowModel: require("./kycflow.model"),
+    KycFlowLogModel: require("./kycflowlog.model"),
+    ClientIdWithMobileNoModel: require("./clientid_with_mobileno.model"),
+    hdfcUPIModel: require("./hdfc_upi_model"),
+    sipModel: require("./sip_model"),
+    marketStatusModel: require("./market_status_model"),
+    notificationModel: require("./notification_model"),
+    categoryModel: require('./category.model'),
+    scannerformModel: require('./scanner_form.model'),
+    categoryTypeModel: require('./category_type.model'),
+
+}

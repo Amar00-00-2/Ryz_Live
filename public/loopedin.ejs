@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Updates</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        #loopedin-sidebar-body{
+            width:100%!important;
+        }
+        .parent-x{
+            top:6px!important;
+        }
+        /* #loopedin-sidebar{
+            padding: 0!important;
+        } */
+    </style>
+</head>
+<body style="margin: 0!important;">
+    <script>
+        var li_sidebar = {
+            workspace_id : "043f4abd-0acd-46ff-b9f1-da17a6430a32",
+        };
+    </script>
+    <script type="text/javascript" src="https://cdn.loopedin.io/js/sidebar.min.js?v=0.1" defer></script>
+    <script defer>
+        window.onload = (event) => {
+            console.log('page is fully loaded');
+            setTimeout(() => {
+                LoopedIn.sidebar.show()	
+                // setTimeout(() => {
+                //     console.log(document.getElementsByClassName("parent-x"))
+                // }, 2000);
+            }, 3000);
+        };
+    </script> 
+</body>
+</html>

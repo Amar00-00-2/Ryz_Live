@@ -1,0 +1,129 @@
+ var XtsMarketDataWS = require("xts-marketdata-api").WS;
+const { robotData } = require("./myevents");
+	
+module.exports = (io) => {
+  const ioconnection = io.of("/common_marketdata");
+  ioconnection.on("connect", async (socket) => {
+//    console.log("/common_marketdata connected");
+    // console.log("watchlist marketdata connected", socket.handshake.auth);
+    socket.on("test_socket_data",async (tt)=>{
+	xtsMarketDataWS = new XtsMarketDataWS(process.env.SocketAPIMarketDataURL);
+      var socketInitRequest = {
+        userID: tt.userid,
+        publishFormat: "JSON",
+        broadcastMode: "Full",
+        token: tt.token
+      };
+
+      xtsMarketDataWS.init(socketInitRequest);
+      console.log("Socket Iniated test")
+      xtsMarketDataWS.onConnect((connectData) => {
+        console.log('connected test')
+      });
+      xtsMarketDataWS.onMarketDepthEvent(async (marketDepthData) => {
+console.log(marketDepthData.Touchline.LastTradedPrice)
+       socket.emit('test_ltp_data',marketDepthData) 
+     })
+    })
+
+    socket.on("run_unique_data", async ( userSessionData) => {
+
+      //Common Market Live Data
+      xtsMarketDataWS = new XtsMarketDataWS(process.env.SocketAPIMarketDataURL);
+      var socketInitRequest = {
+        userID: userSessionData.clientdata.ClientId,
+        publishFormat: "JSON",
+        broadcastMode: "Full",
+        token: userSessionData.marketdataclientsession,
+      };
+
+      xtsMarketDataWS.init(socketInitRequest);
+      console.log("Socket Iniated")
+      xtsMarketDataWS.onConnect((connectData) => {
+	console.log('connected')
+      });
+
+      xtsMarketDataWS.onMarketDepthEvent(async (marketDepthData) => {
+	if(marketDepthData.ExchangeInstrumentID=='243149'){
+	console.log('web',marketDepthData.ExchangeInstrumentID, marketDepthData.Touchline.LastTradedPrice, (new Date()).getTime())
+	}
+	  //Ltp data
+	  // socket.emit('get_ltp_data', {LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+	  
+    // socket.emit('get_ltp_data_eq',{LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+    
+    // socket.emit('get_ltp_data_fut',{LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+
+	  // socket.emit('get_ltp_data_fut_basket',{LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+
+	  // socket.emit('get_ltp_data_eq_basket',{LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+
+	  // socket.emit('get_ltp_data_fut_basket_modify',{LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+
+	  // socket.emit('get_ltp_data_eq_basket_modify',{LastTradedPrice: marketDepthData.Touchline.LastTradedPrice, Close: marketDepthData.Touchline.Close, PercentChange: marketDepthData.Touchline.PercentChange, ExchangeSegment: marketDepthData.ExchangeSegment, ExchangeInstrumentID: marketDepthData.ExchangeInstrumentID})
+
+    // // Index_data
+	  // socket.emit('get_unique_stock_data_indice',marketDepthData)
+    // // Watchlist & Dashboard Socket Emit
+    // socket.emit("get_unique_stock_data", marketDepthData);
+	  // // watchlist table row data
+	  // socket.emit("get_unique_stock_data_watchlist_table", marketDepthData);
+	  // watchlist  tab layou data
+    socket.emit("get_unique_stock_data_watchlist_tab", marketDepthData);
+	  // // Home indice component
+    // socket.emit("get_unique_stock_data_indice_home", marketDepthData);
+	  // // Indice list 
+	  // socket.emit("get_unique_stock_data_indice_list", marketDepthData);
+	  // // Scanners list
+	  // socket.emit("get_unique_stock_data_scanners_list",marketDepthData)
+	  // // Basket List
+	  // socket.emit("get_unique_stock_data_basket_list",marketDepthData)
+	  // // Basket List
+    // socket.emit("get_unique_stock_data_peers_list",marketDepthData)
+
+	  // socket.emit("get_unique_stock_data_eq",marketDepthData)
+    // socket.emit("get_unique_stock_data_fut",marketDepthData)
+    // socket.emit("get_stock_positions_data", {
+    //   ii: marketDepthData.ExchangeInstrumentID,
+    //   price: marketDepthData.Touchline.LastTradedPrice,
+    //   percentage: marketDepthData.Touchline.PercentChange,
+    //   diff:
+    //     marketDepthData.Touchline.LastTradedPrice -
+    //     marketDepthData.Touchline.Close,
+    //   openprice: marketDepthData.Touchline.Open,
+    //   close: marketDepthData.Touchline.Close,
+    //   marketDepthData,
+    // });
+    // socket.emit("get_stock_holdings_data", {
+    //   ii: marketDepthData.ExchangeInstrumentID,
+    //   price: marketDepthData.Touchline.LastTradedPrice,
+    //   percentage: marketDepthData.Touchline.PercentChange,
+    //   diff:
+    //     marketDepthData.Touchline.LastTradedPrice -
+    //     marketDepthData.Touchline.Close,
+    //   openprice: marketDepthData.Touchline.Open,
+    //   close: marketDepthData.Touchline.Close,
+    //   marketDepthData,
+    // });
+
+  });
+
+      xtsMarketDataWS.onOpenInterestEvent((openInterestData) => {
+        if (sno_oi == 5) {
+          socket.emit("get_stock_data_1510", openInterestData);
+        }
+        sno_oi += 1;
+      });
+    
+    
+    });
+    socket.on("disconnect", () => {
+      console.log("Common Market Data socket disconnected")
+      // console.log("socket marketdata disconnected", userSessionData.clientdata.ClientId)
+      socket.disconnect();
+      robotData.remove(socket.id);
+    });
+
+    
+  });
+};

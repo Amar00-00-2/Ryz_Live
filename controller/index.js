@@ -1,0 +1,18 @@
+module.exports = {
+    userController: require('./user.controller'),
+    watchlistController: require('./watchlist.controller'),
+    recentSearchController: require('./recentsearch.controller'),
+    basketController: require('./basket.controller'),
+    freshDeskController: require('./freshdesk.controller'),
+    KycFlowController: require('./kycflow.controller'),
+    hdfcBankController: require('./hdfc_upi_controller'),
+    sipController: require('./sip_controller'),
+    fileUploadController: require('./file_upload_controller'),
+    estimate_ctrl: require('./estimate.controller'),
+    notificationController: require('./notification_controller'),
+    category_ctrl:require('./category.controller'),
+    scanner_form_ctrl:require('./scanner_form.controller'),
+    basketOrderController:require('./basket_order.controller'),
+    category_type_ctrl:require('./category_type.controller'),
+    instrument_sub_ctrl: require("./instrument_sub.controller"),
+}

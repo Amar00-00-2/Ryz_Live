@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>TradingView Charting Library example</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+        <base href = "/" />
+	<!-- <meta http-equiv="refresh" content="60"> -->
+        <script
+            type="text/javascript"
+            src="charting_library_clonned_data/charting_library/charting_library.js">
+        </script>
+        <script src="socket.io/socket.io.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+        <!-- Custom datafeed module. -->
+        <script>
+            var sym = '<%- data.sym %>'
+            var es = '<%- data.es %>'
+            var ei = '<%- data.ei %>'
+            var token = '<%- data.token %>'
+            var userid = '<%- data.uid %>'
+            var source = '<%- data.src %>'
+        </script>
+        <script type="module" src="src/main.js"></script>
+    </head>
+    <body style="margin:0px;">
+        <div id="tv_chart_container">
+            <!-- This div will contain the Charting Library widget. -->
+        </div>
+    </body>
+</html>

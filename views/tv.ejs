@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading View Library Graph</title>
+</head>
+<style>
+    #tvchart{
+        /* position: absolute; */
+        height: 98vh;
+        width: 98vw;
+    }
+</style>
+<body>
+    <div id="tvchart"></div>
+</body>
+<script src="/static/lightweight-charts.standalone.production.js"></script>
+<!-- <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script> -->
+<script>
+
+const renderChart = async () =>{
+    const chartProperties = {
+        timeScale: {
+            timeVisible: true,
+            secondsVisible: true,
+            },
+        pane: 0,
+    };
+    const domElement = document.getElementById('tvchart');
+    const chart = LightweightCharts.createChart(domElement, chartProperties);
+    const candleseries = chart.addCandlestickSeries();
+    var data = '<%- ohlcData %>'
+    console.log(data)
+    candleseries.setData(JSON.parse(data))
+};
+
+renderChart()
+</script>
+</html>
